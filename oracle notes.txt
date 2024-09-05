@@ -1,0 +1,450 @@
+// dbms_output.put_line()--> should print only one recourd
+// if we open exception section we can not leave it empty
+//pragma exception_init(ex,-01400);--> note that we used "-" befor exception id
+// else if is not elsif the first one is regular if inside else, so it needs end if 
+, bit the second one is else if that we know
+___________________________________________________________________________________________________
+<<firstone>>
+declare 
+x int :=10;
+var number :=2;
+var1 number not null :=2 ; 
+var2 varchar2(30) ;
+var3 date :=to_date('04/09/2003');
+var0000000000#_$ number;
+varb boolean;
+cursor box is(select ename,sal from emp);
+cursor box2 is (select * from emp);
+cursor box3(x number) is(select * from emp where empno=x);
+trow box3%rowtype;
+tempn emp.ename%type;
+temps emp.sal%type;
+--rt r;--> error
+--------------------------------------------------------
+begin
+open box3(7698) ;
+loop 
+fetch box3 into trow ;
+exit when box3%notfound;
+dbms_output.put_line(trow.ename);
+end loop;
+dbms_output.put_line('*');
+--open box2 ;
+for var in box2 loop
+dbms_output.put_line(var.job);
+end loop;
+
+--close box2;
+
+if( not box%isopen) then 
+open box;
+end if;
+loop
+
+fetch box into tempn,temps;
+exit when box%notfound; 
+dbms_output.put_line(tempn||'   '||temps);
+
+end loop;
+dbms_output.put_line(box%rowcount);-- total number of rows fetched 
+--dbms_output.put_line(box%notfound);--error
+--close box; cursor close outomaticly when all rows fetched
+
+dbms_output.put_line('_');
+dbms_output.put_line(to_char(var3,'d/mm/y'));
+dbms_output.put_line(firstone.var3 +  2);
+dbms_output.put_line(var1**5);
+if(var1 ~=9) then
+dbms_output.put_line('yes');
+end if;
+select to_char(sysdate) into var2 from dual;
+select sal into var1  from emp where empno=7369;
+dbms_output.put_line(var1);
+dbms_output.put_line(var2);
+select to_char(sysdate) into var2 from dual;
+
+--select * from emp;
+dbms_output.put_line('cursor'||sql%rowcount);
+/*
+select last_day(sysdate) from dual;
+select add_months(sysdate,7) from dual;
+select current_date from dual;
+select sysdate from dual;
+select current_timestamp from dual;
+SELECT months_between(TO_DATE('01-JUL-2024', 'DD-MON-YYYY'), TO_DATE('01-JAN-2024', 'DD-MON-YYYY')) FROM dual;
+*/
+
+<<inone>>
+declare
+var number :=1;
+begin
+dbms_output.put_line('internal print');
+dbms_output.put_line(var);--1
+dbms_output.put_line(inone.var);--1
+dbms_output.put_line(firstone.var);--2
+
+end;
+<< Myprogram >>
+Declare
+ms emp.sal%type default 0;
+t emp.sal%type default 0;
+n emp.ename%type default '';
+begin
+dbms_output.put_line('Myprogram');
+select sum(sal) into t from emp;
+select max(sal) into ms from emp;
+select ename into n from emp where sal=ms ;
+dbms_output.put_line(t);
+if(t>2000)
+then 
+dbms_output.put_line('you must fire '||n);
+--delete from emp where ename=n;
+ else
+dbms_output.put_line('every thing under control ');
+
+
+end if;
+dbms_output.put_line('end');
+end;
+<<if_Stament>>
+declare 
+x int :=20;
+y int :=2;
+begin
+dbms_output.put_line('#########################################################');
+if(x~=20) then
+dbms_output.put_line('x not equal 20');
+else if(x<10 and x^=7) then
+dbms_output.put_line('A');
+elsif(x=9) then
+dbms_output.put_line('B');
+elsif(x=0 or x>19) then
+dbms_output.put_line('C');
+if(x=21) then
+dbms_output.put_line('D');
+else
+dbms_output.put_line('E');
+end if;
+end if;
+end if;
+dbms_output.put_line('...............................................');
+case x
+when 20 then dbms_output.put_line('A');
+when 5 then dbms_output.put_line('B');
+when 67 then dbms_output.put_line('C');
+else dbms_output.put_line('D');
+end case;
+---------------------------------------------------------------------------
+
+case 
+when x=20 then dbms_output.put_line('A');-- will tacke this one
+when x=20 then dbms_output.put_line('B');
+when x<67 then dbms_output.put_line('C');
+else dbms_output.put_line('D');
+end case;
+
+x := case y
+when 30 then 8
+when 6 then 9
+when 20 then 10
+else 7
+end;
+end;
+dbms_output.put_line('==========================================================');
+
+dbms_output.put_line('for loop');
+for x in reverse 1..5 loop
+dbms_output.put_line(x);
+--x:=x+9; -- i can not modfiy  x 
+end loop;
+/*
+will do nothig
+for x in reverse 5..1 loop
+dbms_output.put_line(x);
+end loop;
+*/
+dbms_output.put_line('while loop');
+while x>0 loop
+dbms_output.put_line(x);
+x:= x-1;
+end loop;
+---------------------------------------------------------------------------------------------------
+declare
+Type R is Record(
+    Fname emp.ename%type :='Zaid',
+    salary emp.sal%type :=10000,
+    deptname dept.dname%type :='SA1' 
+);
+rt r;
+type i is table of emp.ename%type index by binary_integer;
+ind i;
+type index_by_name is table of emp.sal%type index by emp.ename%type;
+My_index index_by_name; 
+---------------------------------
+type index_table is table of emp%rowtype index by binary_integer;
+My_index_table index_table ;
+cu int:=0;
+begin
+dbms_output.put_line('=========================Record=================================');
+select ename,sal,dname into rt from  emp  ,  dept  where emp.deptno=dept.deptno and empno=7369;
+dbms_output.put_line(rt.salary);
+------------------------------------------------------------------------------------------------
+for x in (select ename, empno from emp) loop
+ind(x.empno):=x.ename;
+end loop;
+dbms_output.put_line(ind(7369));
+for x in(select ename,sal from emp) loop
+My_index(x.ename):=x.sal; 
+end loop;
+dbms_output.put_line(My_index('SMITH') );
+-------------------------------------------------------
+for x in (select * from emp) loop
+ cu:=cu+2;
+My_index_table(cu):=x;
+
+dbms_output.put_line(cu||' = '||My_index_table(cu).ename);
+end loop;
+dbms_output.put_line(My_index_table.last);
+dbms_output.put_line(My_index_table.first);
+dbms_output.put_line(My_index_table(My_index_table.last).ename);
+
+end;
+
+-----------------------------------------------------------------------------------------------------------
+declare
+ notnull exception;
+ i_define exception;
+pragma exception_init(notnull,-01400);
+x number := 0;
+y number := -9;
+j number := 6;
+cursor ct is select * from emp;
+r ct%rowtype;
+
+begin
+dbms_output.put_line('=========================Exception=================================');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);-- without error zero
+--user_define_exception
+--if(y<0) then raise  i_define; end if;
+if(j<10) then RAISE_APPLICATION_ERROR(-20001,'the number is less than 10'); end if;
+
+-- using pragma exception_init()
+--insert into emp values(null,'Zaid',null,null,null,null,null,null); 
+-- TOO_MANY_ROWS
+--select sal into x from emp ;  -- nigative
+--dbms_output.put_line('all line after exception traped will not execute');
+
+--NO_DATA_FOUND
+--select sal into x from emp where ename='osama' ;  --100
+
+--zero divide
+--x:=7/0;
+
+--invalid cursor
+-- invalid cursor in PL/SQL typically occurs when you try to use a cursor that is not open
+
+--fetch ct into r ;
+
+
+exception
+-- you can not leave exception section empty=> ERROR
+when  i_define then 
+dbms_output.put_line('nigative number');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+when notnull then 
+dbms_output.put_line('you cannot insert null there');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+rollback;
+when too_many_rows then 
+dbms_output.put_line('TOO_MANY_ROWS');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+rollback;
+when no_data_found then
+dbms_output.put_line('NO DATA FOUND');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+rollback;
+when zero_divide then 
+dbms_output.put_line('ZERO DIVIDE');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+rollback;
+when invalid_cursor then
+dbms_output.put_line('invalid cursor');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+rollback;
+when others then 
+dbms_output.put_line('somthing went wrong');
+dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
+rollback;
+end;
+-----------------------------------------------------------------
+<< function_and_procedure>>
+declare
+x number :=100;
+y number ;
+ci number:=10;
+nc number :=-3;
+begin
+dbms_output.put_line('=========================function_and_procedure=================================');
+dbms_output.put_line('x = '||x);
+dbms_output.put_line('y = '||y);
+insert_e(3,x,y,1,'Zaid','ingineer',123,sysdate,10000,100,10);-- 1,Zaid,ingineer,.... ==> actual prarmeter
+dbms_output.put_line('x = '||x);
+dbms_output.put_line('y = '||y);
+-- =>
+insert_e(3,x,y,1,'Zaid',vjob=>'ingineer',vm=>123,vs=>10000,vd=>sysdate,vc=>100,vf=>10); -- correct
+insert_e(3,x,y,vm=>1,vjob=>'Zaid',vname=>'ingineer',vid=>123,vc=>10000,vd=>sysdate,vs=>100,vf=>10); -- correct
+--insert_e(3,x,y,vm=>1,'Zaid',vname=>'ingineer',vid=>123,vc=>10000,vd=>sysdate,vs=>100,vf=>10);--wrong
+-- all take => , no one, if one use "=>" all parametar after it must use it otherways Error
+-- techer said you must use at least tow 
+--_______________________________function_________________________________________________________
+dbms_output.put_line('_____________________function__________________________________________________________ ');
+--toin(x); error
+dbms_output.put_line(ci||' in inch: '||toin(ci));
+dbms_output.put_line(nc||' in inch: '||toin(nc));
+dbms_output.put_line(bouns_sal(100,7839));
+dbms_output.put_line(bouns_sal(null,7839));
+dbms_output.put_line(cal());
+rollback;
+
+-- you cannot use 'bouns_sal' function inside select statement because of update statment
+--select show_name(empno) from emp;
+rollback;
+
+-- notes about procedure:
+--must be the same number or types of arguments in call to 'INSERT_E'
+--in => it just use it without change value and if you try to change value it will give you error
+-- out => will take it as a new  variable and this variable will get a new value inside procedure in other words:
+-- it will ignore the old value then assign a new value and retun the new value 
+-- in out => like reference in C++
+-- in out and out must pass as variables not value => (7) wrong / (x) right
+-- I can assign undefine variable for in,out and in out
+--------------------------------------------------------------------------------------------------------------------------
+-- notes about functions:
+--I can use it inside SQL command 
+--I can use out argument but in is recommended
+ --  return statment can be in exception section  
+end;
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+-- can not call it inside sql command like select
+-- procedure is DDL statment
+-- procedure will not execute until I call it
+--  by defualt its in clling 
+/*
+create or replace procedure insert_e ( test_in  number,test_out out number,test_inout in out number,vid  in number ,vname in emp.ename%type, vjob in varchar ,vm in number, vd date , vs number ,vc number ,vf number) is
+-- vid , v name,..... ==> formal parameter // you can write it without "or replace"
+ c number;
+begin
+--test_in:= test_in + 1; ERROR => becuse its formal IN parameter so its just for use (you can not assign value for it hello)
+test_out:=20;
+test_out:= test_out + 1;
+test_inout:=test_inout +1;
+INSERT INTO emp (empno, ename, job,MGR, hiredate, sal, comm, deptno)
+    VALUES (vid, vname, vjob,vm,vd, vs, vc, vf);
+dbms_output.put_line('insert to employee');
+exception
+
+when others then 
+dbms_output.put_line('somthing went wrong');
+end insert_e; -- or just end;
+*/
+--_____________________________________________________________________Function______________________________________________________________________________
+/*
+create or replace function toin (i number ) return varchar2 as -- note that i use varhar , it return numbers and its work successfully
+-- because it will do implicit conversion but f we reverse the process it will be run time error
+--e exception;
+inch number;
+begin
+if(i>0) then
+inch:=i*0.3937;
+else 
+dbms_output.put_line('wrong value '); -- 
+return null;
+
+end if;
+return inch;
+exception
+when others then 
+dbms_output.put_line('somthing went wrong');
+
+
+
+end toin;
+------------------------------------
+create or replace function bouns_sal (x number ,k in number) return number  Authid current_user as
+s number;
+e exception ;
+begin 
+if(x<0)then 
+raise e;
+end if;
+if (x=null) then  
+update emp set SAL = sal+cal() where empno=k;
+else
+update emp set SAL = sal+x where empno=k;
+end if;
+select SAL into s from emp where empno=k;
+return s;
+exception 
+when e then 
+dbms_output.put_line('can not insert nigative bouns');
+dbms_output.put_line(sqlerrm);
+rollback;
+end;
+_____________________________________________________________________
+
+create or replace function show_name (i emp.empno%type) return varchar is
+new_name varchar(30);
+begin 
+select ename into new_name from emp where empno=i;
+new_name:='Mr.'||new_name;
+return new_name;
+end;
+--------------------------------------------------------------------------
+create or replace function cal  return number is 
+mi number ;
+mx number;
+re number;
+begin
+ select max(sal) into mx from emp;
+  select min(sal) into mi from emp;
+  re:= (mx-mi)*.02;
+  return re;
+  exception 
+  when others then 
+  dbms_output.put_line('something went wrong');
+  return null;
+end;
+*/
+-----------------------------------------------------------Review of the Data Dictionary:
+/*
+--select user from dual;--==> show the current user
+
+-- anything created bye create word it will stor automatically as object in the data dictionary, data dictionary no one can modifiy it
+
+select* from user_tables; -- retrieves  all information about tables that current user has been create it
+select*from all_tables;-- retrieves  all information about tables that current user created and all tables the current user have access to them
+select*from DBA_tables;-- retrieves  all information about all tables but to use this command  you have to get privilege
+desc all_tables;-- the same of select*from all_tables;
+select * from all_objects;
+--====================================================================================================================
+
+-- you cannot give "create" as privilege
+-- database administrator have all the privileged and you cannot revoke any privilege from him
+-- who can grant privileges? the owner and DBA
+--grant privilege on object to user
+-- you cannot give create as privileges at all
+-- privilege for colums is update 
+--you cannot give privilege on more than one object (table)
+-- all=> object / public=> users
+-- use AUTHID CURRENT_USER to adopt your procedure or function with the new user or protect your database you
+-- can write it before as or is directly in the function or procedure
+grant select, update on emp to APEX_PUBLIC_USER ;
+grant all on dept to public;-- give all privilege for all users
+--grant select on insert_e to public; --error only execute for procedures or functions and execute is only for procedure
+grant execute on insert_e to public;
+revoke drop on dept from APEX_PUBLIC_USER; --error becouse  database administrator have all the privileged and you cannot revoke any privilege from him
+*/
+end;
+
