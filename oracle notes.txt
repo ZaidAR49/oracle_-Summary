@@ -1,16 +1,11 @@
-// dbms_output.put_line()--> should print only one recourd
-// if we open exception section we can not leave it empty
-//pragma exception_init(ex,-01400);--> note that we used "-" befor exception id
-// else if is not elsif the first one is regular if inside else, so it needs end if 
-, bit the second one is else if that we know
-___________________________________________________________________________________________________
 <<firstone>>
 declare 
-x int :=10;
+x int  default 10;
 var number :=2;
-var1 number not null :=2 ; 
-var2 varchar2(30) ;
+var1 number not null :=2 ; --if I add not null constraint I have to declare it inline
+var2 varchar2(30) ;-- i must give it lengh
 var3 date :=to_date('04/09/2003');
+var4 char;-- default length is 1
 var0000000000#_$ number;
 varb boolean;
 cursor box is(select ename,sal from emp);
@@ -19,9 +14,18 @@ cursor box3(x number) is(select * from emp where empno=x);
 trow box3%rowtype;
 tempn emp.ename%type;
 temps emp.sal%type;
+
 --rt r;--> error
+
 --------------------------------------------------------
+
 begin
+-- note => any comparison involving NULL with standard operators like >, <, =, <>, etc., will always result in NULL so we must use not null or is null..
+if(null<>-999) then dbms_output.put_line('yea');
+else dbms_output.put_line('no');
+--grant select, update on dept to public;-- we can not  use DDL command like drop,alter,invoke,grant..... within plsql block 
+ -- always no
+ end if;
 open box3(7698) ;
 loop 
 fetch box3 into trow ;
@@ -29,7 +33,8 @@ exit when box3%notfound;
 dbms_output.put_line(trow.ename);
 end loop;
 dbms_output.put_line('*');
---open box2 ;
+--open box2 ; error because cursor is already open
+-- for each will open cursor implicitly
 for var in box2 loop
 dbms_output.put_line(var.job);
 end loop;
@@ -51,10 +56,10 @@ dbms_output.put_line(box%rowcount);-- total number of rows fetched
 --close box; cursor close outomaticly when all rows fetched
 
 dbms_output.put_line('_');
-dbms_output.put_line(to_char(var3,'d/mm/y'));
-dbms_output.put_line(firstone.var3 +  2);
-dbms_output.put_line(var1**5);
-if(var1 ~=9) then
+dbms_output.put_line(to_char(var3,'dd/mm/y'));
+dbms_output.put_line(firstone.var3 +  2); -- add for days
+dbms_output.put_line(var1**5);-- 32
+if(var1 <=9) then -- !=,~=,?=,<>,<=,>=
 dbms_output.put_line('yes');
 end if;
 select to_char(sysdate) into var2 from dual;
@@ -62,16 +67,15 @@ select sal into var1  from emp where empno=7369;
 dbms_output.put_line(var1);
 dbms_output.put_line(var2);
 select to_char(sysdate) into var2 from dual;
-
---select * from emp;
-dbms_output.put_line('cursor'||sql%rowcount);
+dbms_output.put_line('implict cursor = '||sql%rowcount);
 /*
-select last_day(sysdate) from dual;
+select * from emp;
+select last_day(sysdate) from dual; -- last day of current month 31,30,29
 select add_months(sysdate,7) from dual;
-select current_date from dual;
+select current_date from dual; as same as sysdate
 select sysdate from dual;
 select current_timestamp from dual;
-SELECT months_between(TO_DATE('01-JUL-2024', 'DD-MON-YYYY'), TO_DATE('01-JAN-2024', 'DD-MON-YYYY')) FROM dual;
+SELECT months_between(TO_DATE('01-JUL-2024', 'DD-MON-YYYY'), TO_DATE('01-JAN-2024', 'DD-MON-YYYY')) FROM dual;--6
 */
 
 <<inone>>
@@ -98,39 +102,44 @@ dbms_output.put_line(t);
 if(t>2000)
 then 
 dbms_output.put_line('you must fire '||n);
---delete from emp where ename=n;
+delete from emp where ename=n;
+rollback;
  else
 dbms_output.put_line('every thing under control ');
-
 
 end if;
 dbms_output.put_line('end');
 end;
 <<if_Stament>>
 declare 
-x int :=20;
+x int :=21;
 y int :=2;
 begin
 dbms_output.put_line('#########################################################');
-if(x~=20) then
+if(x~=21) then
 dbms_output.put_line('x not equal 20');
 else if(x<10 and x^=7) then
 dbms_output.put_line('A');
 elsif(x=9) then
 dbms_output.put_line('B');
-elsif(x=0 or x>19) then
+elsif(x=0 or x<19) then
 dbms_output.put_line('C');
-if(x=21) then
+if(x=21) then -- folowing esleif
 dbms_output.put_line('D');
 else
 dbms_output.put_line('E');
+end if;
+else if (x=9) then -- else if its not the same as elseif
+dbms_output.put_line('F');
+else 
+dbms_output.put_line('G');
 end if;
 end if;
 end if;
 dbms_output.put_line('...............................................');
 case x
 when 20 then dbms_output.put_line('A');
-when 5 then dbms_output.put_line('B');
+when 21 then dbms_output.put_line('B');
 when 67 then dbms_output.put_line('C');
 else dbms_output.put_line('D');
 end case;
@@ -138,7 +147,7 @@ end case;
 
 case 
 when x=20 then dbms_output.put_line('A');-- will tacke this one
-when x=20 then dbms_output.put_line('B');
+when x>8 and x<22 then dbms_output.put_line('B');-- will take the first right
 when x<67 then dbms_output.put_line('C');
 else dbms_output.put_line('D');
 end case;
@@ -146,9 +155,10 @@ end case;
 x := case y
 when 30 then 8
 when 6 then 9
-when 20 then 10
+when 21 then 10
 else 7
-end;
+end;-- just end not end case
+dbms_output.put_line(x);
 end;
 dbms_output.put_line('==========================================================');
 
@@ -164,6 +174,7 @@ dbms_output.put_line(x);
 end loop;
 */
 dbms_output.put_line('while loop');
+x:=5;
 while x>0 loop
 dbms_output.put_line(x);
 x:= x-1;
@@ -176,7 +187,7 @@ Type R is Record(
     deptname dept.dname%type :='SA1' 
 );
 rt r;
-type i is table of emp.ename%type index by binary_integer;
+type i is table of emp.ename%type index by binary_integer;-- like array
 ind i;
 type index_by_name is table of emp.sal%type index by emp.ename%type;
 My_index index_by_name; 
@@ -204,8 +215,9 @@ My_index_table(cu):=x;
 
 dbms_output.put_line(cu||' = '||My_index_table(cu).ename);
 end loop;
-dbms_output.put_line(My_index_table.last);
-dbms_output.put_line(My_index_table.first);
+dbms_output.put_line('');
+dbms_output.put_line(My_index_table.last);-- gives index
+dbms_output.put_line(My_index_table.first);-- gives index
 dbms_output.put_line(My_index_table(My_index_table.last).ename);
 
 end;
@@ -226,25 +238,23 @@ dbms_output.put_line('=========================Exception========================
 dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);-- without error zero
 --user_define_exception
 --if(y<0) then raise  i_define; end if;
-if(j<10) then RAISE_APPLICATION_ERROR(-20001,'the number is less than 10'); end if;
+--if(j<10) then RAISE_APPLICATION_ERROR(-20001,'the number is less than 10'); end if;
 
 -- using pragma exception_init()
 --insert into emp values(null,'Zaid',null,null,null,null,null,null); 
--- TOO_MANY_ROWS
+-- TOO_MANY_ROWS-----------------------------------------------------------------------[1]
 --select sal into x from emp ;  -- nigative
 --dbms_output.put_line('all line after exception traped will not execute');
 
---NO_DATA_FOUND
+--NO_DATA_FOUND------------------------------------------------------------------------[2]
 --select sal into x from emp where ename='osama' ;  --100
 
---zero divide
+--zero divide--------------------------------------------------------------------------[3]
 --x:=7/0;
 
---invalid cursor
+--invalid cursor-----------------------------------------------------------------------[4]
 -- invalid cursor in PL/SQL typically occurs when you try to use a cursor that is not open
-
 --fetch ct into r ;
-
 
 exception
 -- you can not leave exception section empty=> ERROR
@@ -255,6 +265,7 @@ when notnull then
 dbms_output.put_line('you cannot insert null there');
 dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
 rollback;
+------------------------------ Defined by oracle 
 when too_many_rows then 
 dbms_output.put_line('TOO_MANY_ROWS');
 dbms_output.put_line(sqlerrm||' Error code: '||sqlcode);
@@ -296,8 +307,8 @@ insert_e(3,x,y,vm=>1,vjob=>'Zaid',vname=>'ingineer',vid=>123,vc=>10000,vd=>sysda
 --insert_e(3,x,y,vm=>1,'Zaid',vname=>'ingineer',vid=>123,vc=>10000,vd=>sysdate,vs=>100,vf=>10);--wrong
 -- all take => , no one, if one use "=>" all parametar after it must use it otherways Error
 -- techer said you must use at least tow 
---_______________________________function_________________________________________________________
-dbms_output.put_line('_____________________function__________________________________________________________ ');
+--function________________________________________________________
+dbms_output.put_line('function_________________________________________________________ ');
 --toin(x); error
 dbms_output.put_line(ci||' in inch: '||toin(ci));
 dbms_output.put_line(nc||' in inch: '||toin(nc));
@@ -330,9 +341,10 @@ end;
 -- can not call it inside sql command like select
 -- procedure is DDL statment
 -- procedure will not execute until I call it
---  by defualt its in clling 
+--  by defualt its in calling 
+-- default formal(parametar) is only for IN (default for out or in out is ERROR)
 /*
-create or replace procedure insert_e ( test_in  number,test_out out number,test_inout in out number,vid  in number ,vname in emp.ename%type, vjob in varchar ,vm in number, vd date , vs number ,vc number ,vf number) is
+create or replace procedure insert_e ( test_in  number default 10 ,test_out out number ,test_inout in out number ,vid  in number ,vname in emp.ename%type, vjob in varchar ,vm in number, vd date , vs number ,vc number ,vf number) is
 -- vid , v name,..... ==> formal parameter // you can write it without "or replace"
  c number;
 begin
@@ -349,7 +361,7 @@ when others then
 dbms_output.put_line('somthing went wrong');
 end insert_e; -- or just end;
 */
---_____________________________________________________________________Function______________________________________________________________________________
+--Function_____________________________________________________________________________
 /*
 create or replace function toin (i number ) return varchar2 as -- note that i use varhar , it return numbers and its work successfully
 -- because it will do implicit conversion but f we reverse the process it will be run time error
@@ -416,6 +428,52 @@ begin
   dbms_output.put_line('something went wrong');
   return null;
 end;
+____________________________________________________________________________________________________
+create or replace function calculate_sal (n in varchar ,s in number , co in number , h in date ) return number Authid current_user as 
+ xd number ;
+exdc number :=0;
+e Exception ;
+nn exception ;
+pragma exception_init(nn,-01400);
+begin
+
+if (n is null or s is null  or h is null ) then
+raise nn;
+elsif(co<0 or s<0) then
+raise e;
+elsif(s<300) then 
+raise_Application_error(-20005,'salary is too low');
+return null;
+else
+xd:= to_number(sysdate-h)/360;
+exdc:=case
+ when xd>3 and xd<5 then 500
+ when xd>5 and xd<10 then 1000
+ when xd>10 then 1200
+end;
+end if;
+if(co is null) then 
+return s+exdc;
+else
+return s+exdc+co;
+end if;
+exception 
+when nn then 
+dbms_output.put_line(' invalid input');
+dbms_output.put_line( sqlerrm ||' || '|| sqlcode);
+rollback;
+return null;
+when e then
+dbms_output.put_line(' negative salary or Commission');
+dbms_output.put_line( sqlerrm||' || '|| sqlcode);
+rollback;
+return null;
+when others then 
+dbms_output.put_line(' something went wrong');
+dbms_output.put_line( sqlerrm||' || '|| sqlcode);
+rollback;
+return null;
+end calculate_sal;
 */
 -----------------------------------------------------------Review of the Data Dictionary:
 /*
@@ -437,14 +495,13 @@ select * from all_objects;
 -- you cannot give create as privileges at all
 -- privilege for colums is update 
 --you cannot give privilege on more than one object (table)
--- all=> object / public=> users
+-- all=> privileges / public=> users
 -- use AUTHID CURRENT_USER to adopt your procedure or function with the new user or protect your database you
 -- can write it before as or is directly in the function or procedure
 grant select, update on emp to APEX_PUBLIC_USER ;
-grant all on dept to public;-- give all privilege for all users
+grant all on dept to public;-- give all privilege on dept for all users
 --grant select on insert_e to public; --error only execute for procedures or functions and execute is only for procedure
 grant execute on insert_e to public;
 revoke drop on dept from APEX_PUBLIC_USER; --error becouse  database administrator have all the privileged and you cannot revoke any privilege from him
 */
 end;
-
